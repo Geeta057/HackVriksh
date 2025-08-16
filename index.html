@@ -1,0 +1,1107 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hack Vriksh 2025 - World's Premier Hackathon</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.18.9/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #1a3c34;
+      color: #f5f5f5;
+    }
+    .hero-bg {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect width="100%" height="100%" fill="%231a3c34"/><path d="M0 50 Q25% 50, 30% 80 Q50% 80, 70% 40 Q75% 40, 90% 80 Q95% 80, 100% 50" fill="none" stroke="%234a7043" stroke-width="10" opacity="0.3"/></svg>') center/cover no-repeat;
+    }
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    #three-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 10;
+    }
+    .section-bg {
+      background-color: #2e4a3e;
+      position: relative;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><path d="M100 10 L90 50 L110 50 Z M100 60 L80 100 L120 100 Z" fill="%238b5e3c" opacity="0.1"/><path d="M50 150 Q75 140, 100 150 T150 150" stroke="%234a7043" stroke-width="2" fill="none" opacity="0.2"/></svg>') repeat;
+    }
+    .section-divider {
+      border-top: 2px solid #8b5e3c;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path d="M0 10 Q5 5, 10 10 T20 10" stroke="%234a7043" stroke-width="2" fill="none"/></svg>') repeat-x;
+    }
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      background: linear-gradient(145deg, rgba(26,60,52,0.2), rgba(74,112,67,0.2));
+      border: 2px solid #4a7043;
+      border-radius: 1.5rem;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .card-hover:hover {
+      transform: translateY(-10px) rotateY(10deg);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
+      border-color: #4a7043;
+    }
+    .card-hover:hover::after {
+      content: '🌃';
+      position: absolute;
+      top: -2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.5rem;
+      animation: sway 2s ease-in-out infinite;
+    }
+    .navbar-link {
+      position: relative;
+      transition: color 0.3s ease;
+    }
+    .navbar-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -2px;
+      left: 0;
+      background-color: #4a7043;
+      transition: width 0.3s ease;
+    }
+    .navbar-link:hover::after {
+      width: 100%;
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .leaf-animation {
+      position: absolute;
+      top: -10px;
+      animation: fall 7s linear infinite;
+      font-size: 1.5rem;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-10px) rotate(0deg); opacity: 0.9; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+    @keyframes sway {
+      0%, 100% { transform: translateX(-50%) rotate(0deg); }
+      50% { transform: translateX(-50%) rotate(15deg); }
+    }
+    .trail-container {
+      position: relative;
+      padding: 4rem 0;
+      min-height: 400px;
+      overflow-x: auto;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="400" viewBox="0 0 100 400"><path d="M0 0 L50 100 L100 200 L50 300 L100 400" fill="none" stroke="%238b5e3c" stroke-width="20" opacity="0.1"/></svg>') center/100% auto no-repeat;
+    }
+    .trail-path {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      z-index: 0;
+      animation: drawTrail 2s ease-out forwards;
+      transform: translateY(-50%);
+    }
+    @keyframes drawTrail {
+      0% { stroke-dashoffset: 2000; }
+      100% { stroke-dashoffset: 0; }
+    }
+    .trail-glow {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      z-index: 0;
+      animation: glow 3s ease-in-out infinite;
+      transform: translateY(-50%);
+    }
+    @keyframes glow {
+      0% { opacity: 0.3; }
+      50% { opacity: 0.5; }
+      100% { opacity: 0.3; }
+    }
+    .trail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      min-width: 1000px;
+      padding: 2rem 0;
+    }
+    .trail-stone {
+      background: linear-gradient(145deg, rgba(26,60,52,0.2), rgba(74,112,67,0.2));
+      padding: 1.5rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      width: 300px;
+      min-height: 120px;
+      position: relative;
+      transform-style: preserve-3d;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      opacity: 0;
+    }
+    .trail-stone::before {
+      content: '🌿';
+      position: absolute;
+      top: -2rem;
+      left: 1.5rem;
+      font-size: 2rem;
+      animation: sway 3s ease-in-out infinite;
+    }
+    .trail-node {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      background: #4a7043;
+      border-radius: 50%;
+      border: 3px solid #1a3c34;
+      z-index: 2;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .trail-node:hover {
+      transform: scale(1.3);
+      box-shadow: 0 0 15px rgba(74, 112, 67, 0.6);
+    }
+    .trail-stone:nth-child(odd) .trail-node {
+      bottom: -3rem;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .trail-stone:nth-child(even) .trail-node {
+      top: -3rem;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .sponsor-button, .register-button {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: pulse 2s ease-in-out infinite;
+      background: linear-gradient(to right, #1a3c34, #4a7043);
+    }
+    .sponsor-button:hover, .register-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+    .sponsor-button::after, .register-button::after {
+      content: '🌿';
+      position: absolute;
+      top: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      animation: sway 2s ease-in-out infinite;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .sponsor-button:hover::after, .register-button:hover::after {
+      opacity: 1;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    .countdown-timer {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      background: linear-gradient(145deg, #1a3c34, #4a7043);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), 0 0 20px rgba(74, 112, 67, 0.6);
+      z-index: 20;
+      margin: 2rem auto;
+      border: 3px solid #4a7043;
+      max-width: 600px;
+    }
+    .countdown-box {
+      background: linear-gradient(145deg, rgba(26,60,52,0.2), rgba(74,112,67,0.2));
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      min-width: 120px;
+      border: 2px solid #4a7043;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
+    .modal-content {
+      background: linear-gradient(145deg, rgba(26,60,52,0.2), rgba(74,112,67,0.2));
+      padding: 2rem;
+      border-radius: 1rem;
+      max-width: 90%;
+      max-height: 90%;
+      overflow: auto;
+      position: relative;
+      animation: slideIn 0.3s ease-out;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #f5f5f5;
+    }
+    .chat-button {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background: linear-gradient(145deg, #1a3c34, #4a7043);
+      color: #ffffff;
+      padding: 1rem;
+      border-radius: 50%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      z-index: 40;
+      transition: transform 0.3s ease;
+    }
+    .chat-button:hover {
+      transform: scale(1.1);
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    .faq-answer.open {
+      max-height: 200px;
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #2e4a3e 25%, #3a5a4a 50%, #2e4a3e 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s infinite;
+    }
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    @media (max-width: 1280px) {
+      .trail-row { min-width: 900px; }
+    }
+    @media (max-width: 1024px) {
+      .trail-row { min-width: 700px; }
+    }
+    @media (max-width: 768px) {
+      .trail-container { overflow-x: hidden; }
+      .trail-row {
+        flex-direction: column;
+        min-width: auto;
+      }
+      .trail-stone {
+        margin: 1.5rem auto;
+        max-width: 90%;
+        width: 90%;
+        min-height: auto;
+      }
+      .trail-node {
+        bottom: -2rem !important;
+        top: auto !important;
+      }
+      .trail-path, .trail-glow { display: none; }
+      .hero-bg {
+        min-height: 80vh;
+        background-attachment: scroll;
+      }
+      .countdown-timer {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+        margin: 1rem auto;
+      }
+      .countdown-box {
+        padding: 1rem;
+        min-width: 100px;
+      }
+      .countdown-box span {
+        font-size: 2rem !important;
+      }
+      .faq-answer { max-height: 0; }
+      .faq-answer.open { max-height: 300px; }
+      #three-canvas { display: none; }
+    }
+    @media (max-width: 640px) {
+      .hero-bg { min-height: 70vh; }
+      .countdown-timer { max-width: 90%; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <div id="particles-js"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const Navbar = () => {
+      return (
+        <nav className="bg-[#1a3c34] shadow-lg fixed w-full z-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-16 items-center">
+              <div className="flex items-center">
+                <h1 className="text-3xl font-extrabold text-[#f5f5f5]">Hack Vriksh</h1>
+              </div>
+              <div className="flex items-center space-x-6">
+                {['Home', 'About', 'Domains', 'Timeline', 'Prizes', 'Highlights', 'Sponsors', 'Contact', 'FAQ'].map((item) => (
+                  <a
+                    key={item}
+                    href={`#${item.toLowerCase()}`}
+                    className="text-[#f5f5f5] hover:text-[#4a7043] font-medium navbar-link"
+                  >
+                    {item}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </nav>
+      );
+    };
+
+    const Hero = () => {
+      const [timeLeft, setTimeLeft] = useState({
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0
+      });
+      const [participantCount, setParticipantCount] = useState(0);
+      const titleRef = useRef(null);
+      const taglineRef = useRef(null);
+
+      useEffect(() => {
+        // GSAP Text Animation
+        gsap.fromTo(
+          titleRef.current.children,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: 'power2.out' }
+        );
+        gsap.fromTo(
+          taglineRef.current.children,
+          { opacity: 0, x: -20 },
+          { opacity: 1, x: 0, stagger: 0.1, duration: 0.8, ease: 'power2.out', delay: 0.5 }
+        );
+
+        // Participant Counter Animation
+        gsap.to({ count: 0 }, {
+          count: 5000,
+          duration: 2,
+          ease: 'power1.out',
+          onUpdate: function () {
+            setParticipantCount(Math.floor(this.targets()[0].count));
+          }
+        });
+
+        // Particles.js
+        window.particlesJS('particles-js', {
+          particles: {
+            number: { value: 50, density: { enable: true, value_area: 800 } },
+            shape: { type: 'image', image: { src: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231a3c34"%3E%3Cpath d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/%3E%3C/svg%3E', width: 24, height: 24 } },
+            opacity: { value: 0.5, random: true },
+            size: { value: 10, random: true },
+            move: { enable: true, speed: 2, direction: 'bottom', random: true }
+          },
+          interactivity: {
+            events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' } },
+            modes: { repulse: { distance: 100 }, push: { particles_nb: 4 } }
+          }
+        });
+
+        // Three.js 3D Leaves
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.position.z = 5;
+
+        const geometry = new THREE.PlaneGeometry(0.2, 0.2);
+        const material = new THREE.MeshBasicMaterial({ color: 0x4a7043, side: THREE.DoubleSide });
+        const leaves = [];
+        for (let i = 0; i < 10; i++) {
+          const leaf = new THREE.Mesh(geometry, material);
+          leaf.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, Math.random() * 2 - 1);
+          leaf.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+          scene.add(leaf);
+          leaves.push(leaf);
+        }
+
+        const animate = () => {
+          requestAnimationFrame(animate);
+          leaves.forEach(leaf => {
+            leaf.rotation.y += 0.01;
+            leaf.position.y -= 0.005;
+            if (leaf.position.y < -2) leaf.position.y = 2;
+          });
+          renderer.render(scene, camera);
+        };
+        animate();
+
+        // Countdown Timer
+        const targetDate = new Date('2025-09-30T23:59:59');
+        const interval = setInterval(() => {
+          const now = new Date();
+          const difference = targetDate - now;
+
+          const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+          setTimeLeft({ days, hours, minutes, seconds });
+
+          if (difference < 0) {
+            clearInterval(interval);
+            setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+          }
+        }, 1000);
+
+        return () => clearInterval(interval);
+      }, []);
+
+      return (
+        <section id="home" className="hero-bg pt-24 pb-16">
+          <canvas id="three-canvas"></canvas>
+          <div className="hero-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in">
+            <h1 ref={titleRef} className="text-5xl sm:text-7xl font-extrabold mb-4 text-white">
+              <span>H</span><span>a</span><span>c</span><span>k</span> <span>V</span><span>r</span><span>i</span><span>k</span><span>s</span><span>h</span> <span>2</span><span>0</span><span>2</span><span>5</span>
+            </h1>
+            <p ref={taglineRef} className="text-xl sm:text-3xl mb-6 font-serif text-white">
+              <span>C</span><span>o</span><span>d</span><span>e</span><span>.</span> <span>C</span><span>r</span><span>e</span><span>a</span><span>t</span><span>e</span><span>.</span> <span>C</span><span>u</span><span>l</span><span>t</span><span>i</span><span>v</span><span>a</span><span>t</span><span>e</span><span>.</span>
+            </p>
+            <p className="text-lg mb-8 max-w-3xl mx-auto font-serif text-white">
+              Join {participantCount.toLocaleString()}+ innovators worldwide in the world's premier hackathon to build groundbreaking solutions.
+            </p>
+            <a
+              href="https://unstop.com/hackathons/hackvriksh-2025-codecreatecultivate-dronacharya-group-of-institutions-dgi-greater-noida-1533418"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block text-white px-10 py-4 rounded-full font-semibold hover:bg-[#4a7043] transition transform register-button"
+            >
+              Register Now
+            </a>
+            <div className="countdown-timer">
+              {['Days', 'Hours', 'Minutes', 'Seconds'].map((unit, index) => (
+                <div key={unit} className="countdown-box">
+                  <span className="text-5xl sm:text-5xl font-bold text-[#f5f5f5]">{timeLeft[unit.toLowerCase()]}</span>
+                  <p className="text-sm font-serif text-[#f5f5f5]">{unit}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-lg mt-4 font-serif text-white">Registration Ends: 30 Sep 2025</p>
+          </div>
+        </section>
+      );
+    };
+
+    const About = () => {
+      const whyJoinRef = useRef(null);
+
+      useEffect(() => {
+        gsap.from(whyJoinRef.current.children, {
+          opacity: 0,
+          y: 10,
+          stagger: 0.2,
+          duration: 0.5,
+          scrollTrigger: {
+            trigger: whyJoinRef.current,
+            start: 'top 80%'
+          }
+        });
+      }, []);
+
+      return (
+        <section id="about" className="section-bg py-16 section-divider">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 fade-in">
+            <h2 className="text-4xl font-bold text-[#f5f5f5] mb-6 text-center">About Hack Vriksh</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="p-6 rounded-lg shadow-md card-hover">
+                <p className="text-lg text-[#f5f5f5] mb-4 font-serif">
+                  Hack Vriksh is a global tech movement by Tech Vriksh, empowering innovators to create world-changing solutions.
+                </p>
+                <p className="text-lg text-[#f5f5f5] font-serif">
+                  With 500+ active members across 50+ cities and events like TechPath 1.0 at Microsoft, we're redefining innovation on a global scale.
+                </p>
+              </div>
+              <div className="p-6 rounded-lg shadow-md card-hover">
+                <h3 className="text-xl font-semibold text-[#f5f5f5] mb-4">Why Join Hack Vriksh?</h3>
+                <ul ref={whyJoinRef} className="list-disc list-inside text-[#f5f5f5] space-y-2 font-serif">
+                  <li className="hover:text-[#4a7043] transition-colors">Mentorship from industry leaders at top tech companies</li>
+                  <li className="hover:text-[#4a7043] transition-colors">Real-world challenges from global companies</li>
+                  <li className="hover:text-[#4a7043] transition-colors">Workshops on AI, Web3, and cutting-edge tech</li>
+                  <li className="hover:text-[#4a7043] transition-colors">Network with top innovators worldwide</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    };
+
+    const Domains = () => {
+      const domainIcons = {
+        "Healthcare": "🩺",
+        "Fintech": "💸",
+        "AI for Social Good": "🤖",
+        "Web3 and Blockchain": "⛓️",
+        "Smart Urban Mobility": "🚗",
+        "Cloud": "☁️",
+        "Cyber Security": "🔒",
+        "Open Innovation": "💡"
+      };
+
+      return (
+        <section id="domains" className="py-16 section-bg section-divider">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-4xl font-bold text-[#f5f5f5] mb-6 text-center">Innovation Focus Areas</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                "Healthcare",
+                "Fintech",
+                "AI for Social Good",
+                "Web3 and Blockchain",
+                "Smart Urban Mobility",
+                "Cloud",
+                "Cyber Security",
+                "Open Innovation"
+              ].map((domain, index) => (
+                <div
+                  key={domain}
+                  className="p-6 rounded-lg shadow-md card-hover relative"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <span className="absolute top-2 right-2 text-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100">{domainIcons[domain]}</span>
+                  <h3 className="text-xl font-semibold text-[#f5f5f5]">{domain}</h3>
+                  <p className="text-[#f5f5f5] mt-2 font-serif">Tackle global challenges in {domain.toLowerCase()} with innovative solutions.</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    };
+
+    const Timeline = () => {
+      useEffect(() => {
+        gsap.utils.toArray('.trail-stone').forEach((stone, i) => {
+          gsap.fromTo(
+            stone,
+            { opacity: 0, x: -50, rotateY: -10 },
+            {
+              opacity: 1,
+              x: 0,
+              rotateY: 0,
+              duration: 0.6,
+              ease: 'power2.out',
+              scrollTrigger: {
+                trigger: stone,
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+              }
+            }
+          );
+        });
+      }, []);
+
+      return (
+        <section id="timeline" className="section-bg py-16 relative section-divider">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-4xl font-bold text-[#f5f5f5] mb-12 text-center">Hackathon Timeline</h2>
+            <div className="trail-container">
+              <svg className="trail-path" preserveAspectRatio="none">
+                <path
+                  d="M10 50 Q25% 50, 30% 80 Q50% 80, 70% 40 Q75% 40, 90% 80 Q95% 80, 99% 50"
+                  fill="none"
+                  stroke="#4a7043"
+                  strokeWidth="14"
+                  strokeLinecap="round"
+                  strokeDasharray="2000"
+                />
+                <path
+                  className="trail-glow"
+                  d="M10 50 Q25% 50, 30% 80 Q50% 80, 70% 40 Q75% 40, 90% 80 Q95% 80, 99% 50"
+                  fill="none"
+                  stroke="#1a3c34"
+                  strokeWidth="10"
+                  strokeLinecap="round"
+                  strokeDasharray="20,20"
+                  opacity="0.4"
+                />
+              </svg>
+              <div className="trail-row">
+                <div className="trail-stone card-hover">
+                  <p className="text-lg font-semibold text-[#f5f5f5]">16 Aug 2025 - 30 Sep 2025</p>
+                  <p className="text-[#f5f5f5] font-serif">Registrations Open & Close</p>
+                  <div className="trail-node"></div>
+                </div>
+                <div className="trail-stone card-hover">
+                  <p className="text-lg font-semibold text-[#f5f5f5]">3-12 Oct 2025</p>
+                  <p className="text-[#f5f5f5] font-serif">Pre-Hackathon Sessions: Strategy, Ideation, Tech Stack, UI/UX, Pitching</p>
+                  <div className="trail-node"></div>
+                </div>
+                <div className="trail-stone card-hover">
+                  <p className="text-lg font-semibold text-[#f5f5f5]">16-19 Oct 2025</p>
+                  <p className="text-[#f5f5f5] font-serif">Round 1: Online Submission (PPT & Prototype) & Top 30 Teams Selected</p>
+                  <div className="trail-node"></div>
+                </div>
+                <div className="trail-stone card-hover">
+                  <p className="text-lg font-semibold text-[#f5f5f5]">29 Nov 2025</p>
+                  <p className="text-[#f5f5f5] font-serif">Round 2: Grand Finale (24-hour Offline Coding Marathon)</p>
+                  <div className="trail-node"></div>
+                </div>
+              </div>
+              <div className="text-center mt-8">
+                <a
+                  href="https://hackvriksh.com/schedule.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block text-white px-8 py-3 rounded-full font-semibold hover:bg-[#4a7043] transition transform sponsor-button"
+                >
+                  View Full Schedule
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    };
+
+    const Highlights = () => (
+      <section id="highlights" className="py-16 section-bg section-divider">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 fade-in">
+          <h2 className="text-4xl font-bold text-[#f5f5f5] mb-6 text-center">Event Highlights</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="p-6 rounded-lg shadow-md card-hover">
+              <p className="text-3xl font-bold text-[#f5f5f5]">5,000+</p>
+              <p className="text-[#f5f5f5] font-serif">Expected Participants from 50+ Countries</p>
+            </div>
+            <div className="p-6 rounded-lg shadow-md card-hover">
+              <p className="text-3xl font-bold text-[#f5f5f5]">50+</p>
+              <p className="text-[#f5f5f5] font-serif">Cities Represented</p>
+            </div>
+            <div className="p-6 rounded-lg shadow-md card-hover">
+              <p className="text-3xl font-bold text-[#f5f5f5]">200+</p>
+              <p className="text-[#f5f5f5] font-serif">Innovative Projects Expected</p>
+            </div>
+          </div>
+          <p className="text-[#f5f5f5] mt-6 text-center text-lg font-serif">
+            Based on Tech Vriksh's global community and past events
+          </p>
+        </div>
+      </section>
+    );
+
+    const Sponsors = () => {
+      const [showModal, setShowModal] = useState(false);
+
+      return (
+        <section id="sponsors" className="section-bg py-16 section-divider">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 fade-in">
+            <h2 className="text-4xl font-bold text-[#f5f5f5] mb-6 text-center">Sponsorship Opportunities</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                {
+                  level: "Platinum",
+                  cost: "₹1,60,000",
+                  benefits: [
+                    "Premium branding across all platforms",
+                    "Logo on website, social media, posters",
+                    "Live mentions at opening & closing ceremonies",
+                    "Full access to participant database"
+                  ]
+                },
+                {
+                  level: "Gold",
+                  cost: "₹1,20,000",
+                  benefits: [
+                    "Featured on website, posters, digital materials",
+                    "Live shoutout at opening ceremony",
+                    "Logo on event backdrop",
+                    "Partial access to participant data"
+                  ]
+                },
+                {
+                  level: "Silver",
+                  cost: "₹70,000",
+                  benefits: [
+                    "Value-packed option for medium visibility",
+                    "Listed on website and digital materials",
+                    "Mentioned in social media posts"
+                  ]
+                },
+                {
+                  level: "Bronze",
+                  cost: "₹40,000",
+                  benefits: [
+                    "Logo on website footer",
+                    "Mention in select social media posts"
+                  ]
+                }
+              ].map((sponsor, index) => (
+                <div key={sponsor.level} className="p-6 rounded-lg shadow-md card-hover" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <h3 className="text-xl font-semibold text-[#f5f5f5]">{sponsor.level} Sponsor</h3>
+                  <p className="text-[#f5f5f5] font-bold mb-2">{sponsor.cost}</p>
+                  <ul className="list-disc list-inside text-[#f5f5f5] space-y-1 font-serif">
+                    {sponsor.benefits.map((benefit, index) => (
+                      <li key={index}>{benefit}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            <div className="text-center mt-8">
+              <button
+                onClick={() => setShowModal(true)}
+                className="inline-block text-white px-8 py-3 rounded-full font-semibold hover:bg-[#4a7043] transition transform sponsor-button"
+              >
+                Want to Become a Sponsor?
+              </button>
+            </div>
+          </div>
+          {showModal && (
+            <div className="modal">
+              <div className="modal-content">
+                <span className="modal-close" onClick={() => setShowModal(false)}>×</span>
+                <h3 className="text-2xl font-bold text-[#f5f5f5] mb-4">Sponsorship Brochure</h3>
+                <p className="text-[#f5f5f5] font-serif mb-4">
+                  Download our brochure to learn more about sponsorship opportunities for Hack Vriksh 2025.
+                </p>
+                <a
+                  href="https://hackvriksh.com/sponsorship-brochure.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block text-white px-6 py-2 rounded-full font-semibold hover:bg-[#4a7043]"
+                >
+                  Download Brochure
+                </a>
+              </div>
+            </div>
+          )}
+        </section>
+      );
+    };
+
+    const Prizes = () => (
+      <section id="prizes" className="py-16 section-bg section-divider">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 fade-in">
+          <h2 className="text-4xl font-bold text-[#f5f5f5] mb-6 text-center">Prizes & Rewards</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { title: "1st Position", prize: "Cash Prize" },
+              { title: "2nd Position", prize: "Cash Prize" },
+              { title: "3rd Position", prize: "Cash Prize" },
+              { title: "Best Girls Team", prize: "Cash Prize" },
+              { title: "Top 10 Teams", prize: "Opportunity to Work with Tech Vriksh" },
+              { title: "Best Domain Teams", prize: "Internship from Sponsors" }
+            ].map((item, index) => (
+              <div key={item.title} className="p-6 rounded-lg shadow-md card-hover" style={{ animationDelay: `${index * 0.1}s` }}>
+                <h3 className="text-xl font-semibold text-[#f5f5f5]">{item.title}</h3>
+                <p className="text-[#f5f5f5] mt-2 font-serif">{item.prize}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-[#f5f5f5] mt-6 text-center text-lg font-serif">
+            Every participant receives a certificate and a sapling as a token of appreciation!
+          </p>
+        </div>
+      </section>
+    );
+
+    const Contact = () => (
+      <section id="contact" className="py-16 section-bg section-divider">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in">
+          <h2 className="text-4xl font-bold text-[#f5f5f5] mb-6">Get in Touch</h2>
+          <p className="text-lg text-[#f5f5f5] mb-4 font-serif">Have questions or want to partner with us?</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-6 mb-6">
+            <p className="text-lg text-[#f5f5f5] font-serif">
+              Email:{' '}
+              <a href="mailto:official.techvriksh@yahoo.com" className="text-[#4a7043] hover:underline">
+                official.techvriksh@yahoo.com
+              </a>
+            </p>
+            <p className="text-lg text-[#f5f5f5] font-serif">
+              Phone:{' '}
+              <a href="tel:+919310156579" className="text-[#4a7043] hover:underline">
+                +91 93101 56579
+              </a> (Krishna Agarwal)
+            </p>
+          </div>
+          <div className="flex justify-center gap-6 mt-6">
+            <a
+              href="https://www.instagram.com/techvrikshofficial/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#4a7043] hover:text-[#f5f5f5] transition-colors"
+              aria-label="Instagram"
+            >
+              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+            </a>
+            <a
+              href="https://www.linkedin.com/company/tech-vriksh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#4a7043] hover:text-[#f5f5f5] transition-colors"
+              aria-label="LinkedIn"
+            >
+              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+            </a>
+            <a
+              href="https://chat.whatsapp.com/I2moRpO9Uw16kk7ft8qNZQ"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#4a7043] hover:text-[#f5f5f5] transition-colors"
+              aria-label="WhatsApp"
+            >
+              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+    );
+
+    const FAQ = () => {
+      const [openIndex, setOpenIndex] = useState(null);
+      const [searchTerm, setSearchTerm] = useState('');
+
+      const faqs = [
+        {
+          question: "Who can participate?",
+          answer: "Anyone passionate about tech—students, professionals, or enthusiasts—worldwide, with no age or experience restrictions."
+        },
+        {
+          question: "How do I register?",
+          answer: "Click 'Register Now' on the homepage and complete the form by 30 Sep 2025. Team registrations are preferred."
+        },
+        {
+          question: "Is the hackathon virtual or in-person?",
+          answer: "Round 1 (16-19 Oct 2025) is online only; the Grand Finale (29 Nov 2025) is offline only."
+        },
+        {
+          question: "What are the team size requirements?",
+          answer: "Teams must have 2-4 members."
+        },
+        {
+          question: "What kind of projects can we submit?",
+          answer: "Innovative solutions in domains like Healthcare, Fintech, AI, Web3, Cloud, Cybersecurity, or Open Innovation."
+        },
+        {
+          question: "Are there any fees to participate?",
+          answer: "No registration fees—Hack Vriksh 2025 is free for all participants to encourage global participation."
+        }
+      ];
+
+      const filteredFaqs = faqs.filter(faq =>
+        faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      const toggleFAQ = (index) => {
+        setOpenIndex(openIndex === index ? null : index);
+      };
+
+      return (
+        <section id="faq" className="py-16 section-bg section-divider">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 fade-in">
+            <h2 className="text-4xl font-bold text-[#f5f5f5] mb-6 text-center">Frequently Asked Questions</h2>
+            <div className="mb-6">
+              <input
+                type="text"
+                placeholder="Search FAQs..."
+                className="w-full p-3 rounded-lg border-2 border-[#4a7043] bg-[rgba(26,60,52,0.2)] text-[#f5f5f5] focus:outline-none"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {filteredFaqs.length > 0 ? filteredFaqs.map((faq, index) => (
+                <div
+                  key={index}
+                  className="p-6 rounded-lg shadow-md card-hover cursor-pointer"
+                  onClick={() => toggleFAQ(index)}
+                  role="button"
+                  aria-expanded={openIndex === index}
+                  aria-controls={`faq-answer-${index}`}
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <h3 className="text-xl font-semibold text-[#f5f5f5] mb-2">{faq.question}</h3>
+                  <div
+                    id={`faq-answer-${index}`}
+                    className={`faq-answer text-[#f5f5f5] font-serif ${openIndex === index ? 'open' : ''}`}
+                  >
+                    {faq.answer}
+                  </div>
+                </div>
+              )) : (
+                <p className="text-[#f5f5f5] text-center col-span-2">No FAQs found matching your search.</p>
+              )}
+            </div>
+          </div>
+        </section>
+      );
+    };
+
+    const Footer = () => (
+      <footer className="bg-[#1a3c34] text-white py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="font-serif">© 2025 Hack Vriksh by Tech Vriksh. All rights reserved.</p>
+        </div>
+      </footer>
+    );
+
+    const ChatButton = () => {
+      const [showChat, setShowChat] = useState(false);
+
+      return (
+        <>
+          <button
+            onClick={() => setShowChat(true)}
+            className="chat-button"
+          >
+            💬
+          </button>
+          {showChat && (
+            <div className="modal">
+              <div className="modal-content">
+                <span className="modal-close" onClick={() => setShowChat(false)}>×</span>
+                <h3 className="text-2xl font-bold text-[#f5f5f5] mb-4">Ask Us</h3>
+                <p className="text-[#f5f5f5] font-serif mb-2">Q: What's the registration process?</p>
+                <p className="text-[#f5f5f5] font-serif mb-4">A: Click "Register Now" and fill out the form by 30 Sep 2025.</p>
+                <p className="text-[#f5f5f5] font-serif mb-2">Q: Who can participate?</p>
+                <p className="text-[#f5f5f5] font-serif">A: Anyone passionate about tech, from students to professionals, worldwide!</p>
+              </div>
+            </div>
+          )}
+        </>
+      );
+    };
+
+    const App = () => {
+      useEffect(() => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in');
+              }
+            });
+          },
+          { threshold: 0.1 }
+        );
+
+        document.querySelectorAll('.section-bg').forEach(section => observer.observe(section));
+        return () => observer.disconnect();
+      }, []);
+
+      return (
+        <div>
+          <Navbar />
+          <Hero />
+          <About />
+          <Domains />
+          <Timeline />
+          <Prizes />
+          <Highlights />
+          <Sponsors />
+          <Contact />
+          <FAQ />
+          <ChatButton />
+          <Footer />
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
